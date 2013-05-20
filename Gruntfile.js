@@ -1,6 +1,7 @@
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.initConfig({
     pgk: grunt.file.readJSON('package.json'),
     watch: {
@@ -26,6 +27,16 @@ module.exports = function(grunt) {
           'src/jails.js'
         ],
         dest: 'lib/jails.js'
+      }
+    },
+    uglify: {
+      options: {
+        sourceMap: 'lib/jails.min.map'
+      },
+      jails: {
+        files: {
+          'lib/jails.min.js': [ 'lib/jails.js' ]
+        }
       }
     }
   });
