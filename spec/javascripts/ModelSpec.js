@@ -72,6 +72,14 @@ var ModelTests = function(Model) {
               expect(model.id).toEqual(id);
             });
           });
+          describe("hash as second parameter", function() {
+            beforeEach(function() {
+              model = Model(id, { name: 'ben' });
+            });
+            it("sets the attributes", function() {
+              expect(model.get('name')).toEqual('ben');
+            });
+          });
         });
       });
       describe("#constructor", function() {
