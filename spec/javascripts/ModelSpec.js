@@ -179,7 +179,7 @@ var ModelTests = function(Model) {
       });
     };
 
-describe("Model", function() {
+describe("Jails.Model", function() {
   ModelTests(Model);
 });
 describe("ExtendedModel", function() {

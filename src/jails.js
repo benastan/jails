@@ -25,13 +25,23 @@
     }
   };
 
-  var Dataset = function(model, query) {
-        this.model = model;
-        this.models = [];
-        if (query instanceof Query) {
-          this.query = query;
+  var Dataset = function(model_or_query) {
+        var model;
+        if (this instanceof Dataset) {
+          if (model_or_query instanceof Query) {
+            this.query = model_or_query;
+            this.model = model_or_query.model;
+          } else {
+            this.model = model_or_query;
+          }
+          this.models = [];
+        } else {
+          return new Dataset(model_or_query);
         }
       };
+  Dataset.prototype.count = function() {
+    return this.models.length;
+  };
   Dataset.prototype.add = wrap(function(model) {
     var preExistingModel, mergeModel;
     if (model instanceof this.model) {
@@ -261,7 +271,7 @@
     return this.all().query();
   };
   Model.count = function() {
-    return this.dataset.models.length;
+    return this.dataset.count();
   };
   Model.empty = function() {
     this.dataset.empty();
