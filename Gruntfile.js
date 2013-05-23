@@ -22,6 +22,8 @@ module.exports = function(grunt) {
           'src/jails/utility.js',
           'src/jails/queue.js',
           'src/jails/dataset.js',
+          'src/jails/ajax_data_source.js',
+          'src/jails/http_data_source.js',
           'src/jails/query.js',
           'src/jails/model.js',
           'src/jails.js'

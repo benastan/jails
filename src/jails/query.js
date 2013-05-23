@@ -1,6 +1,3 @@
-var HTTP = Jails.HTTP || function() {
-  $.ajax.apply($, arguments);
-};
 var Query = function(model, dataset) {
       var _this = this;
       this.model = model;
@@ -33,7 +30,7 @@ Query.prototype.query = wrap(function(cb) {
   var model = this.model,
       dataset = this.dataset,
       query = this;
-  Jails.HTTP({
+  Jails.data_source({
     type: 'GET',
     url: this.url(),
     data: this.queryParams,

@@ -8,3 +8,9 @@ var wrap = function(fn) {
       return typeof anything !== 'undefined';
     };
 
+
+if (typeof jQuery === 'undefined' && typeof Zepto === 'undefined') {
+  $ = require('jquery').create();
+} else {
+  $ = jQuery || Zepto;
+}
