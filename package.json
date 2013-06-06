@@ -1,9 +1,7 @@
 {
   "name": "jails",
   "version": "0.1.0",
-  "dependencies": {
-    "jquery": "*"
-  },
+  "main": "lib/jails.server.js",
   "devDependencies": {
     "expect.js": "*",
     "mocha": "*",

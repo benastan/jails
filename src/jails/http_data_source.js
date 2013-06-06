@@ -31,3 +31,4 @@ HTTPDataSource.request = function(settings, success, error) {
   });
   req.end();
 };
+Jails.dataSource = Jails.dataSource || HTTPDataSource;

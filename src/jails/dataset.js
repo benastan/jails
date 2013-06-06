@@ -103,3 +103,12 @@ Dataset.prototype.filter = function(key, val) {
   dataset.models = models;
   return dataset;
 };
+Dataset.prototype.at = function(index) {
+  return Dataset.models[index];
+};
+Dataset.prototype.first = function() {
+  return this.at(0);
+};
+Dataset.prototype.last = function() {
+  return this.at(this.count());
+}

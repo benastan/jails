@@ -6,14 +6,34 @@ module.exports = function(grunt) {
     pgk: grunt.file.readJSON('package.json'),
     watch: {
       files: [
-        'src/**/*'
+        'src/**/*',
+        'test/**/*',
+        'spec/**/*'
       ],
       tasks: [
-        'concat:jails'
+        'concat:client',
+        'concat:server',
+        'concat:test'
       ]
     },
     concat: {
-      jails: {
+      client: {
+        options: {
+          banner: ";(function() {\n",
+          footer: "}());"
+        },
+        src: [
+          'src/jails/utility.js',
+          'src/jails/queue.js',
+          'src/jails/dataset.js',
+          'src/jails/ajax_data_source.js',
+          'src/jails/query.js',
+          'src/jails/model.js',
+          'src/jails.js'
+        ],
+        dest: 'lib/jails.js'
+      },
+      server: {
         options: {
           banner: ";(function(Jails) {\n",
           footer: "}({}));"
@@ -22,13 +42,22 @@ module.exports = function(grunt) {
           'src/jails/utility.js',
           'src/jails/queue.js',
           'src/jails/dataset.js',
-          'src/jails/ajax_data_source.js',
           'src/jails/http_data_source.js',
           'src/jails/query.js',
           'src/jails/model.js',
           'src/jails.js'
         ],
-        dest: 'lib/jails.js'
+        dest: 'lib/jails.server.js'
+      },
+      test: {
+        src: [
+          'bower_components/jquery/jquery.js',
+          'node_modules/expect.js/expect.js',
+          'node_modules/mocha/mocha.js',
+          'lib/jails.js',
+          'test/client/test.js'
+        ],
+        dest: 'public/test.js'
       }
     },
     uglify: {

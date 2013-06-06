@@ -30,7 +30,7 @@ Query.prototype.query = wrap(function(cb) {
   var model = this.model,
       dataset = this.dataset,
       query = this;
-  Jails.data_source({
+  Jails.dataSource({
     type: 'GET',
     url: this.url(),
     data: this.queryParams,

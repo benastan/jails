@@ -1,5 +1,5 @@
-var Jails = require('../lib/jails'),
-    expect = require('expect.js');
+var Jails = require('../../lib/jails.server.js');
+var expect = require('expect.js');
 
 describe("HTTPDataSource", function() {
   var options, request;
@@ -17,6 +17,7 @@ describe("HTTPDataSource", function() {
           done();
         },
         error: function() {
+          expect(true).to.beFalse();
           done();
         }
       };
