@@ -21,9 +21,12 @@ task :release do
   %x(gzip -c lib/jails.min.js > lib/jails.min.js.gz)
 end
 
-task :test do
-  build
-  %x(cp ./lib/jails.js ./public/javascripts/jails.js)
-  %x(cp ./node_modules/mocha/mocha.js ./public/javascripts/mocha.js)
-  %x(cp ./node_modules/expect.js/expect.js ./public/javascripts/expect.js)
+namespace :test do
+  task :client do
+    %x(open public/index.html)
+  end
+
+  task :server do
+    %x(mocha test/server/test.js)
+  end
 end
