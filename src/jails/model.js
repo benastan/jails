@@ -102,8 +102,8 @@ var DelegatedMethodsWithObjects = {
   'all limit page where': function() {
     return new Query(this);
   },
-  'count add remove find empty': function() { return this.dataset; }
-}
+  'count add remove find empty filter first last at': function() { return this.dataset; }
+};
 var DelegatedMethods = (function(methods) {
   var keys = (function(memo) {
         for (var i in methods) {
