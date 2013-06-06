@@ -6,6 +6,8 @@ module.exports = function(grunt) {
     pgk: grunt.file.readJSON('package.json'),
     watch: {
       files: [
+        'Gruntfile.js',
+        'public/index.html',
         'src/**/*',
         'test/**/*',
         'spec/**/*'
@@ -55,7 +57,8 @@ module.exports = function(grunt) {
           'node_modules/expect.js/expect.js',
           'node_modules/mocha/mocha.js',
           'lib/jails.js',
-          'test/client/test.js'
+          'test/client/test.js',
+          'test/shared/model_spec.js'
         ],
         dest: 'public/test.js'
       }
