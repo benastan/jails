@@ -80,7 +80,8 @@ Dataset.prototype.filter = function(key, val) {
   var dataset = this.clone(),
       models = dataset.models,
       args = {},
-      currentModel, modelAttrVal, rejectCurrentModel;
+      currentModel, modelAttrVal, rejectCurrentModel,
+      newIndex;
   if (typeof key === 'string' && typeof val !== 'undefined') {
     args[key] = val;
   } else if (args instanceof Object) {
@@ -90,14 +91,24 @@ Dataset.prototype.filter = function(key, val) {
   }
   for (var i in models) {
     currentModel = models[i];
+    newIndex = models.index(currentModel);
     for (key in args) {
       val = args[key];
       modelAttrVal = currentModel.get(key);
       if ((typeof val === 'string' && val != modelAttrVal) || (val instanceof RegExp && val.test(modelAttrVal) === false)) {
-        models.splice(i, 1);
+        models.splice(newIndex, 1);
       }
     }
   }
   dataset.models = models;
   return dataset;
 };
+Dataset.prototype.at = function(index) {
+  return Dataset.models[index];
+};
+Dataset.prototype.first = function() {
+  return this.at(0);
+};
+Dataset.prototype.last = function() {
+  return this.at(this.count());
+}

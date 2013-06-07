@@ -16,7 +16,7 @@ var ModelTests = function(Model) {
               model = Model(attributes);
             });
             it("creates an anonymous model with attributes", function() {
-              expect(model instanceof Model).toBe(true);
+              expect(model instanceof Model).to.equal(true);
             });
           });
           describe("id is an attribute", function() {
@@ -30,7 +30,7 @@ var ModelTests = function(Model) {
             describe("model with id doesn't exist", function() {
               beforeEach(generateModelWithIdFromAttributes);
               it("load model with id", function() {
-                expect(model.id).toEqual(id);
+                expect(model.id).to.equal(id);
               });
             });
             describe("model with id does exist", function() {
@@ -40,7 +40,7 @@ var ModelTests = function(Model) {
               });
               beforeEach(generateModelWithIdFromAttributes);
               it("returns the saved model", function() {
-                expect(model).toEqual(savedModel);
+                expect(model).to.equal(savedModel);
               });
             });
           });
@@ -55,8 +55,8 @@ var ModelTests = function(Model) {
           describe("model with id does not exist", function() {
             beforeEach(instantiateModel);
             it("instantiates model with id", function() {
-              expect(Model.find(id)).not.toBeUndefined();
-              expect(model.id).toEqual(id);
+              expect(Model.find(id)).not.to.be(undefined);
+              expect(model.id).to.equal(id);
             });
           });
           describe("model with id exists", function() {
@@ -67,9 +67,9 @@ var ModelTests = function(Model) {
             });
             beforeEach(instantiateModel);
             it("retrieves the model", function() {
-              expect(modelCountBefore).toBeGreaterThan(0);
-              expect(Model.count()).toEqual(modelCountBefore);
-              expect(model.id).toEqual(id);
+              expect(modelCountBefore).to.be.greaterThan(0);
+              expect(Model.count()).to.equal(modelCountBefore);
+              expect(model.id).to.equal(id);
             });
           });
           describe("hash as second parameter", function() {
@@ -77,7 +77,7 @@ var ModelTests = function(Model) {
               model = Model(id, { name: 'ben' });
             });
             it("sets the attributes", function() {
-              expect(model.get('name')).toEqual('ben');
+              expect(model.get('name')).to.equal('ben');
             });
           });
         });
@@ -89,8 +89,8 @@ var ModelTests = function(Model) {
             model = new Model(id);
           });
           it("instantiates a model with id set", function() {
-            expect(model instanceof Model).toEqual(true);
-            expect(model.id).toEqual(id);
+            expect(model instanceof Model).to.equal(true);
+            expect(model.id).to.equal(id);
           });
         });
       });
@@ -100,8 +100,8 @@ var ModelTests = function(Model) {
           Model(2);
         });
         it("finds model with a given id", function() {
-          expect(Model.find(1).id).toEqual(1);
-          expect(Model.find(2).id).toEqual(2);
+          expect(Model.find(1).id).to.equal(1);
+          expect(Model.find(2).id).to.equal(2);
         });
       });
       describe("#remove", function() {
@@ -110,14 +110,14 @@ var ModelTests = function(Model) {
           Model(2);
         });
         it("removes model with given id", function() {
-          expect(Model.count()).toEqual(2);
+          expect(Model.count()).to.equal(2);
           Model.remove(1);
-          expect(Model.find(1)).toBeUndefined();
+          expect(Model.find(1)).to.be(undefined)
         });
         it("removes given model", function() {
-          expect(Model.count()).toEqual(2);
+          expect(Model.count()).to.equal(2);
           Model.remove(Model(1));
-          expect(Model.find(1)).toBeUndefined();
+          expect(Model.find(1)).to.be(undefined)
         });
       });
       describe("#empty", function() {
@@ -125,15 +125,15 @@ var ModelTests = function(Model) {
           Model(1);
         });
         it("empties Model.models", function() {
-          expect(Model.count()).toEqual(1);
+          expect(Model.count()).to.equal(1);
           Model.empty();
-          expect(Model.count()).toEqual(0);
+          expect(Model.count()).to.equal(0);
         });
       });
       describe("#count", function() {
         describe("default value", function() {
           it("is zero", function() {
-            expect(Model.count()).toEqual(0);
+            expect(Model.count()).to.equal(0);
           });
         });
         describe("one model", function() {
@@ -141,19 +141,19 @@ var ModelTests = function(Model) {
             Model(1);
           });
           it("is one", function() {
-            expect(Model.count()).toEqual(1);
+            expect(Model.count()).to.equal(1);
           });
         });
       });
       describe("#mergeModels", function() {
-        var conflictModel;
+        var conflictModel, mergeModel;
         beforeEach(function(){
           conflictModel = Model(1, {name: 'ben'});
           model = Model(1, {name: 'benjamin'});
           mergeModel = Model.mergeModels(model, conflictModel);
         });
         it("merges two models", function() {
-          expect(mergeModel.get('name')).toEqual('ben');
+          expect(mergeModel.get('name')).to.equal('ben');
         });
       });
       var fullNameComposer = function() {
@@ -167,7 +167,7 @@ var ModelTests = function(Model) {
           Model.composers = {};
         });
         it("add composer to composers hash", function() {
-          expect(Model.composers.fullName).toEqual(fullNameComposer);
+          expect(Model.composers.fullName).to.equal(fullNameComposer);
         });
       });
       describe("#get", function() {
@@ -179,18 +179,18 @@ var ModelTests = function(Model) {
           Model.composers = {};
         });
         it("gets a requested attribute", function() {
-          expect(model.get('firstName')).toEqual('ben');
+          expect(model.get('firstName')).to.equal('ben');
         });
         it("composes full name", function() {
-          expect(model.get('fullName')).toEqual('ben bergstein');
+          expect(model.get('fullName')).to.equal('ben bergstein');
         });
       });
     };
 
 describe("Jails.Model", function() {
-  ModelTests(Model);
+  ModelTests(Jails.Model);
 });
 describe("ExtendedModel", function() {
-  ExtendedModel = Model.extend();
+  var ExtendedModel = Jails.Model.extend();
   ModelTests(ExtendedModel);
 });

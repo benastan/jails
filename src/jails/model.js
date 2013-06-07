@@ -78,15 +78,6 @@ Model.prototype.setup = function() {
     cb.apply(_this);
   });
 };
-Model.find = function(id) {
-  return this.dataset.find(id);
-};
-Model.add = function(model) {
-  return this.dataset.add(model);
-};
-Model.remove = function(model) {
-  return this.dataset.remove(model);
-};
 Model.prototype.synced = function(cb) {
   this.queue.push(cb);
 };
@@ -101,38 +92,42 @@ Model.extend = function(proto) {
       klass[i] = this[i];
     }
   }
-  for (i in proto) {
-    var method = proto[i],
-        __super = _super.prototype[i];
-    if (typeof method === 'function' && typeof __super === 'function') {
-      method._super = __super;
-    }
-    klass.prototype[i] = method;
-  }
-  // Add dataset methods.
-  for (i in this.QueryMethods) {
-    klass[i] = this.QueryMethods[i];
-  }
+  $.extend(klass, Model, proto);
   klass.extend = this.extend;
   klass.dataset = new Dataset(klass);
   klass.composers = {};
   return klass;
 };
-Model.QueryMethods = 'all limit page where'.split(' ').reduce(function(memo, methodName) {
-  memo[methodName] = function() {
-    var query = new Query(this);
-    return query[methodName].apply(query, arguments);
-  };
-  return memo;
-}, {});
+var DelegatedMethodsWithObjects = {
+  'all limit page where': function() {
+    return new Query(this);
+  },
+  'count add remove find empty filter first last at': function() { return this.dataset; }
+};
+var DelegatedMethods = (function(methods) {
+  var keys = (function(memo) {
+        for (var i in methods) {
+          memo.push(i);
+        }
+        return memo;
+      }([]));
+  return keys.reduce(function(memo, key) {
+    var methodNames = key.split(' ');
+    for (var i in methodNames) {
+      memo[methodNames[i]] = (function(objectMethod, methodName) {
+        return function() {
+          var model = this;
+          object = objectMethod.apply(model);
+          return object[methodName].apply(object, arguments);
+        };
+      }(methods[key], methodNames[i]));
+    }
+    return memo;
+  }, {});
+}(DelegatedMethodsWithObjects));
+$.extend(Model, DelegatedMethods);
 Model.fetch = function() {
   return this.all().query();
-};
-Model.count = function() {
-  return this.dataset.count();
-};
-Model.empty = function() {
-  this.dataset.empty();
 };
 Model.compose = function(key, composer) {
   if (typeof composer === 'function') {
