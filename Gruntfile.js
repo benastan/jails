@@ -2,6 +2,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.initConfig({
     pgk: grunt.file.readJSON('package.json'),
     watch: {
@@ -15,7 +16,8 @@ module.exports = function(grunt) {
       tasks: [
         'concat:client',
         'concat:server',
-        'concat:test'
+        'concat:test',
+        'copy:test'
       ]
     },
     concat: {
@@ -71,6 +73,14 @@ module.exports = function(grunt) {
         files: {
           'lib/jails.min.js': [ 'lib/jails.js' ]
         }
+      }
+    },
+    copy: {
+      test: {
+        files: [{
+          src: ['node_modules/mocha/mocha.css'],
+          dest: 'public/mocha.css'
+        }]
       }
     }
   });
