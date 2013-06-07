@@ -91,7 +91,7 @@ Dataset.prototype.filter = function(key, val) {
   }
   for (var i in models) {
     currentModel = models[i];
-    newIndex = models.index(currentModel);
+    newIndex = models.indexOf(currentModel);
     for (key in args) {
       val = args[key];
       modelAttrVal = currentModel.get(key);
@@ -104,7 +104,7 @@ Dataset.prototype.filter = function(key, val) {
   return dataset;
 };
 Dataset.prototype.at = function(index) {
-  return Dataset.models[index];
+  return this.models[index];
 };
 Dataset.prototype.first = function() {
   return this.at(0);
