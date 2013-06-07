@@ -1,12 +1,3 @@
-begin
-  require 'jasmine'
-  load 'jasmine/tasks/jasmine.rake'
-rescue LoadError
-  task :jasmine do
-    abort "Jasmine is not available. In order to run jasmine, you must: (sudo) gem install jasmine"
-  end
-end
-
 task :setup do
   %x(bundle)
   %x(npm install)
@@ -30,3 +21,5 @@ namespace :test do
     %x(mocha test/server/test.js)
   end
 end
+
+task :default => [:'test:server']

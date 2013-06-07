@@ -2,7 +2,11 @@
   "name": "jails",
   "version": "0.1.0",
   "main": "lib/jails.server.js",
+  "scripts": {
+    "test": "mocha test/server/test.js"
+  },
   "devDependencies": {
+    "jquery": "*",
     "expect.js": "*",
     "mocha": "*",
     "grunt": "~0.4.1",
