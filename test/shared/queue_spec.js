@@ -10,15 +10,16 @@ describe("Jails.Queue", function() {
       contextForCallback = new Date(),
       assignedContext, someVariable, queue, undefined;
   beforeEach(function() {
-    queue = new Queue(callbackWrapper);
+    queue = new Jails.Queue(callbackWrapper);
   });
   afterEach(function() {
     queue = undefined;
   });
   describe('#constructor', function() {
     it("is initialized with a wrapper and a queue", function() {
-      expect(queue.wrapper).toEqual(callbackWrapper);
-      expect(queue.queue).toEqual([]);
+      expect(queue.wrapper).to.be(callbackWrapper);
+      expect(queue.queue.length).to.be(0);
+      expect(queue.queue).to.be.a('array');
     });
   });
   describe("#push", function() {
@@ -26,7 +27,7 @@ describe("Jails.Queue", function() {
       queue.push(queuedCallback);
     });
     it("pushes queuedCallback into the queue", function() {
-      expect(queue.queue.length).toEqual(1);
+      expect(queue.queue.length).to.be(1);
     });
   });
   describe("#flush", function() {
@@ -35,8 +36,8 @@ describe("Jails.Queue", function() {
       queue.flush();
     });
     it("runs all queued callbacks", function() {
-      expect(assignedContext).toEqual(contextForCallback);
-      expect(someVariable).toEqual(firstArgument);
+      expect(assignedContext).to.be(contextForCallback);
+      expect(someVariable).to.be(firstArgument);
     });
   });
 });

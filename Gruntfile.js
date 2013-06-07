@@ -61,7 +61,8 @@ module.exports = function(grunt) {
           'lib/jails.js',
           'test/client/test.js',
           'test/shared/model_spec.js',
-          'test/shared/dataset_spec.js'
+          'test/shared/dataset_spec.js',
+          'test/shared/queue_spec.js'
         ],
         dest: 'public/test.js'
       }
