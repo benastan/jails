@@ -60,7 +60,8 @@ module.exports = function(grunt) {
           'node_modules/mocha/mocha.js',
           'lib/jails.js',
           'test/client/test.js',
-          'test/shared/model_spec.js'
+          'test/shared/model_spec.js',
+          'test/shared/dataset_spec.js'
         ],
         dest: 'public/test.js'
       }

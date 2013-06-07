@@ -116,7 +116,7 @@ var DelegatedMethods = (function(methods) {
     for (var i in methodNames) {
       memo[methodNames[i]] = (function(objectMethod, methodName) {
         return function() {
-          var model = this;
+          var model = this, object;
           object = objectMethod.apply(model);
           return object[methodName].apply(object, arguments);
         };

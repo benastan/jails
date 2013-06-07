@@ -1,6 +1,6 @@
 describe("Jails.Dataset", function() {
   var Klass, dataset, model;
-  Klass = Model.extend();
+  Klass = Jails.Model.extend();
   afterEach(function() {
     delete dataset;
     delete model;
@@ -12,26 +12,27 @@ describe("Jails.Dataset", function() {
     });
     describe("argument is a query", function() {
       beforeEach(function() {
-        dataset = Dataset(query);
+        dataset = Jails.Dataset(query);
       });
       it("sets model and query", function() {
-        expect(dataset.model).toEqual(Klass);
-        expect(dataset.query).toEqual(query);
+        expect(dataset.model).to.be(Klass);
+        expect(dataset.query).to.be(query);
       });
     });
     describe("first argument is a model", function() {
       beforeEach(function() {
-        dataset = Dataset(Klass);
+        dataset = Jails.Dataset(Klass);
       });
       it("sets model only", function() {
-        expect(dataset.model).toEqual(Klass);
+        expect(dataset.model).to.be(Klass);
       });
     });
   });
   describe("#add", function() {
+    var countBefore;
     beforeEach(function() {
       model = Klass();
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
       countBefore = dataset.count();
     });
     afterEach(function() {
@@ -39,31 +40,31 @@ describe("Jails.Dataset", function() {
     });
     describe("adding one model", function() {
       it("adds a model to a dataset", function() {
-        expect(dataset.count()).toEqual(0);
+        expect(dataset.count()).to.be(0);
         dataset.add(model);
-        expect(dataset.count()).toEqual(1);
+        expect(dataset.count()).to.be(1);
       });
     });
     describe("adding many models", function() {
       it("adds many from array as first parameter", function() {
-        expect(countBefore).toEqual(0);
+        expect(countBefore).to.be(0);
         dataset.add([Klass(1), Klass(2), Klass(3)]);
-        expect(dataset.count()).toEqual(3);
+        expect(dataset.count()).to.be(3);
       });
       it("adds many from arguments", function() {
-        expect(countBefore).toEqual(0);
+        expect(countBefore).to.be(0);
         dataset.add(Klass(1), Klass(2), Klass(3));
-        expect(dataset.count()).toEqual(3);
+        expect(dataset.count()).to.be(3);
       });
     });
   });
   describe("#count", function() {
     var expectCountToEqualModelsLength = function() {
-      expect(dataset.count()).toEqual(dataset.models.length);
+      expect(dataset.count()).to.be(dataset.models.length);
     };
     beforeEach(function() {
       model = Klass();
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
     });
     it("equals the length of models property", function() {
       expectCountToEqualModelsLength();
@@ -73,12 +74,11 @@ describe("Jails.Dataset", function() {
   });
   describe("#remove", function() {
     var expectCount = function(count) {
-          expect(dataset.count()).toEqual(count);
-        },
-        id;
+          expect(dataset.count()).to.be(count);
+        }, id;
     beforeEach(function() {
       model = Klass(id);
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
       dataset.add(model);
     });
     describe("id as parameter", function() {
@@ -101,40 +101,42 @@ describe("Jails.Dataset", function() {
     beforeEach(function() {
       id = 1;
       model = Klass(id);
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
       dataset.add(model);
     });
     it("finds model with id", function() {
-      expect(dataset.find(id)).toEqual(model);
+      expect(dataset.find(id)).to.be(model);
     });
   });
   describe("#clone", function() {
-    var cloneModel;
+    var cloneModel, id;
     beforeEach(function() {
       id = 1;
       model = Klass(id);
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
       dataset.add(model);
     });
     describe("dataset with no query", function() {
+      var cloneDataset;
       beforeEach(function() {
         cloneDataset = dataset.clone();
       });
       it("returns a dataset with the same attributes", function() {
-        expect(cloneDataset.count()).toEqual(dataset.count());
-        expect(cloneDataset.models).toEqual(dataset.models);
-        expect(cloneDataset.model).toEqual(dataset.model);
-        expect(cloneDataset.query).toEqual(dataset.query);
-        expect(cloneDataset === dataset).toEqual(false);
+        expect(cloneDataset.count()).to.be(dataset.count());
+        expect(cloneDataset.at(0)).to.be(dataset.at(0));
+        expect(cloneDataset.model).to.be(dataset.model);
+        expect(cloneDataset.query).to.be(dataset.query);
+        expect(cloneDataset === dataset).to.be(false);
       });
     });
     //describe("dataset with query");
   });
   describe("#filter", function() {
-    var modelThatMatchesWhere, modelThatDoesNotMatchWhere, filteredDataset,
-        filterParams, filterParamsKey, filterParamsVal;
+    var modelThatMatchesWhere, modelThatDoesNotMatchWhere,
+        filteredDataset, filterParams, filterParamsKey, filterParamsVal,
+        filteredByHashDataset, filteredByKeyValDataset;
     beforeEach(function() {
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
       filterParams = {};
       filterParams[filterParamsKey] = filterParamsVal;
       modelThatMatchesWhere = Klass(1, filterParams);
@@ -147,7 +149,7 @@ describe("Jails.Dataset", function() {
       filterParamsKey = 'name';
       filterParamsVal = 'ben';
       it("filters the collection, returning a clone", function() {
-        expect(filteredByHashDataset.count()).toEqual(1);
+        expect(filteredByHashDataset.count()).to.be(1);
       });
     });
     describe("filtering using key and value", function() {
@@ -155,28 +157,29 @@ describe("Jails.Dataset", function() {
         filterParamsKey = 'name';
         filterParamsVal = 'ben';
         it("tests string equivalence", function() {
-          expect(filteredByKeyValDataset.count()).toEqual(1);
+          expect(filteredByKeyValDataset.count()).to.be(1);
         });
       });
       describe("value is a RegExp", function() {
         filterParamsKey = 'name';
         filterParamsVal = /en^/;
         it("tests string using RegExp.test", function() {
-          expect(filteredByKeyValDataset.count()).toEqual(1);
+          expect(filteredByKeyValDataset.count()).to.be(1);
         });
       });
     });
   });
   describe("self as function", function() {
+    var id;
     beforeEach(function() {
       id = 1;
       model = Klass(id);
-      dataset = Dataset(Klass);
+      dataset = Jails.Dataset(Klass);
       dataset.add(model);
     });
     describe("integer is first argument", function() {
       it("finds the model", function() {
-        expect(dataset(id)).toEqual(model);
+        expect(dataset(id)).to.be(model);
       });
     });
   });
