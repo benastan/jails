@@ -15469,9 +15469,9 @@ mocha.run = function(fn){
 };
 })();
 ;(function() {
-var oldJails = this.Jails;
-var root = typeof window === 'undefined' ? module.exports : window.Jails = {};
-var wrap = function(fn) {
+var oldJails = this.Jails,
+    root = typeof window === 'undefined' ? module.exports : window.Jails = {},
+    wrap = function(fn) {
       return function() {
         fn.apply(this, arguments);
         return this;
@@ -15480,12 +15480,10 @@ var wrap = function(fn) {
     defined = function(anything) {
       return typeof anything !== 'undefined';
     };
-
-
-if (typeof jQuery === 'undefined' && typeof Zepto === 'undefined') {
-  $ = require('jquery').create();
+if (typeof $ === 'undefined' && typeof Zepto === 'undefined' && typeof require === 'undefined') {
+  throw new Error("Jailed in! One of jQuery or Zepto is a dependency.");
 } else {
-  $ = jQuery || Zepto;
+  $ = require('jquery').create();
 }
 var Jails = root;
 if (typeof oldJails === 'object') {
