@@ -15496,7 +15496,7 @@ if (typeof oldJails === 'object') {
 
 var Queue = function(wrapper) {
       this.wrapper = wrapper;
-      this.queue = [];
+      this.clear();
     };
 Queue.prototype.flush = function() {
   var cb;
@@ -15504,10 +15504,16 @@ Queue.prototype.flush = function() {
     this.wrapper(cb);
   }
 };
+Queue.prototype.trigger = function(args) {
+  this.queue.forEach(this.wrapper);
+};
 Queue.prototype.push = function(cb) {
   if (typeof cb === 'function') {
     this.queue.push(cb);
   }
+};
+Queue.prototype.clear = function() {
+  this.queue = [];
 };
 
 var Dataset = function(model_or_query) {
@@ -15749,10 +15755,16 @@ var Model = function Base(id_or_attributes, attributes) {
       return model;
     };
 Model.prototype.set = function(key, val) {
+  var attrs = {};
   if (typeof key === 'string' || typeof key === 'number') {
-    this.attributes[key] = val;
+    attrs[key] = val;
+    this.set(attrs);
   } else {
-    for (var i in key) this.set(i, key[i]);
+    for (var i in key) {
+      val = key[i];
+      this.trigger('change:'+i, val);
+    }
+    this.trigger('change', key);
   }
 };
 Model.prototype.get = function(key) {
@@ -15763,8 +15775,56 @@ Model.prototype.get = function(key) {
   }
   return val;
 };
+Model.prototype.save = function() {
+  var options = {
+    type: this.id ? 'PUT' : 'POST',
+    url: typeof this.url === 'function' ? this.url() : this.url,
+    data: this.toHash(),
+    success: function(res) {
+      attrs = JSON.parse(res);
+      this.trigger('save');
+      this.set(attrs);
+    },
+    error: function() {
+      var args;
+      args = Array.prototype.slice.apply(arguments);
+      args.unshift('save');
+      this.trigger('error', args);
+    }
+  };
+};
+Model.prototype.on = function(eventName, cb) {
+  var model, events;
+  model = this;
+  events = this.events[eventName] || (this.events[eventName] = new Queue(function(cb) { cb.call(this); }));
+  events.push(cb);
+};
+Model.prototype.off = function(eventName, cb) {
+  var events;
+  if ((events = this.events[eventName]) instanceof Queue) {
+    events.clear();
+  }
+};
+Model.prototype.toHash = function() {
+  var attrs = this.attributes, composer;
+  for (var key in this.composers) {
+    attrs[key] = this.get(key);
+  }
+  return attrs;
+};
+Model.prototype.trigger = function(eventName, arg1, arg2, etc) {
+  var additionalArgs, model, events;
+  additionalArgs = Array.prototype.slice.apply(arguments);
+  model = this;
+  eventName = additionalArgs.shift();
+  if ((events = this.events[eventName]) instanceof Queue) {
+    events.wrapper = function(cb) { cb.apply(model, additionalArgs); };
+    events.trigger(additionalArgs);
+  }
+};
 Model.prototype.setup = function() {
   var _this = this;
+  this.events = {};
   this.queue = new Queue(function(cb) {
     cb.apply(_this);
   });
@@ -16032,6 +16092,67 @@ var ModelTests = function(Model) {
         });
         it("composes full name", function() {
           expect(model.get('fullName')).to.equal('ben bergstein');
+        });
+      });
+      describe("event handling", function() {
+        var testVar, otherTestVar, model,
+            eventName = 'someevent',
+            otherEventName = 'someotherevent',
+            handler = function() { testVar = true; },
+            otherHandler = function() { otherTestVar = true; },
+            key = 'somekey',
+            val = 'someval', attrs;
+        beforeEach(function() {
+          testVar = false;
+          otherTestVar = false;
+          model = Model();
+          model.on(eventName, handler);
+          model.on(otherEventName, otherHandler);
+          attrs = {};
+        });
+        describe("#on, #trigger", function() {
+          beforeEach(function() {
+            model.trigger(eventName);
+          });
+          it('runs the handler when triggered', function() {
+            expect(eventName === otherEventName).to.be(false);
+            expect(testVar).to.be(true);
+            expect(otherTestVar).to.be(false);
+          });
+        });
+        describe("#off", function() {
+          beforeEach(function() {
+            model.off(eventName);
+            model.trigger(eventName);
+          });
+          it('does not run the handler', function() {
+            expect(testVar).to.be(false);
+          });
+        });
+        describe("#set", function() {
+          beforeEach(function() {
+            model.on('change', handler);
+          });
+          it("triggers the handler when an attribute is set", function() {
+            model.set(key, val);
+            expect(testVar).to.be(true);
+          });
+          it("triggers the handler when attributes are set", function() {
+            model.set();
+            expect(testVar).to.be(true);
+          });
+          it("passes the changes as an argument", function(done) {
+            attrs[key] = val;
+            attrs.otherKey = 'somethingElse';
+            model.on('change:'+key, function(key, val) {
+              expect(key).to.be(key);
+            });
+            model.on('change', function(attrs) {
+              expect(attrs[key]).to.be(val);
+              done();
+            });
+            model.set(attrs);
+          });
         });
       });
     };

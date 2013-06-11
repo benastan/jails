@@ -185,6 +185,67 @@ var ModelTests = function(Model) {
           expect(model.get('fullName')).to.equal('ben bergstein');
         });
       });
+      describe("event handling", function() {
+        var testVar, otherTestVar, model,
+            eventName = 'someevent',
+            otherEventName = 'someotherevent',
+            handler = function() { testVar = true; },
+            otherHandler = function() { otherTestVar = true; },
+            key = 'somekey',
+            val = 'someval', attrs;
+        beforeEach(function() {
+          testVar = false;
+          otherTestVar = false;
+          model = Model();
+          model.on(eventName, handler);
+          model.on(otherEventName, otherHandler);
+          attrs = {};
+        });
+        describe("#on, #trigger", function() {
+          beforeEach(function() {
+            model.trigger(eventName);
+          });
+          it('runs the handler when triggered', function() {
+            expect(eventName === otherEventName).to.be(false);
+            expect(testVar).to.be(true);
+            expect(otherTestVar).to.be(false);
+          });
+        });
+        describe("#off", function() {
+          beforeEach(function() {
+            model.off(eventName);
+            model.trigger(eventName);
+          });
+          it('does not run the handler', function() {
+            expect(testVar).to.be(false);
+          });
+        });
+        describe("#set", function() {
+          beforeEach(function() {
+            model.on('change', handler);
+          });
+          it("triggers the handler when an attribute is set", function() {
+            model.set(key, val);
+            expect(testVar).to.be(true);
+          });
+          it("triggers the handler when attributes are set", function() {
+            model.set();
+            expect(testVar).to.be(true);
+          });
+          it("passes the changes as an argument", function(done) {
+            attrs[key] = val;
+            attrs.otherKey = 'somethingElse';
+            model.on('change:'+key, function(key, val) {
+              expect(key).to.be(key);
+            });
+            model.on('change', function(attrs) {
+              expect(attrs[key]).to.be(val);
+              done();
+            });
+            model.set(attrs);
+          });
+        });
+      });
     };
 
 describe("Jails.Model", function() {

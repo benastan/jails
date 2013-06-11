@@ -58,10 +58,16 @@ var Model = function Base(id_or_attributes, attributes) {
       return model;
     };
 Model.prototype.set = function(key, val) {
+  var attrs = {};
   if (typeof key === 'string' || typeof key === 'number') {
-    this.attributes[key] = val;
+    attrs[key] = val;
+    this.set(attrs);
   } else {
-    for (var i in key) this.set(i, key[i]);
+    for (var i in key) {
+      val = key[i];
+      this.trigger('change:'+i, val);
+    }
+    this.trigger('change', key);
   }
 };
 Model.prototype.get = function(key) {
@@ -72,8 +78,56 @@ Model.prototype.get = function(key) {
   }
   return val;
 };
+Model.prototype.save = function() {
+  var options = {
+    type: this.id ? 'PUT' : 'POST',
+    url: typeof this.url === 'function' ? this.url() : this.url,
+    data: this.toHash(),
+    success: function(res) {
+      attrs = JSON.parse(res);
+      this.trigger('save');
+      this.set(attrs);
+    },
+    error: function() {
+      var args;
+      args = Array.prototype.slice.apply(arguments);
+      args.unshift('save');
+      this.trigger('error', args);
+    }
+  };
+};
+Model.prototype.on = function(eventName, cb) {
+  var model, events;
+  model = this;
+  events = this.events[eventName] || (this.events[eventName] = new Queue(function(cb) { cb.call(this); }));
+  events.push(cb);
+};
+Model.prototype.off = function(eventName, cb) {
+  var events;
+  if ((events = this.events[eventName]) instanceof Queue) {
+    events.clear();
+  }
+};
+Model.prototype.toHash = function() {
+  var attrs = this.attributes, composer;
+  for (var key in this.composers) {
+    attrs[key] = this.get(key);
+  }
+  return attrs;
+};
+Model.prototype.trigger = function(eventName, arg1, arg2, etc) {
+  var additionalArgs, model, events;
+  additionalArgs = Array.prototype.slice.apply(arguments);
+  model = this;
+  eventName = additionalArgs.shift();
+  if ((events = this.events[eventName]) instanceof Queue) {
+    events.wrapper = function(cb) { cb.apply(model, additionalArgs); };
+    events.trigger(additionalArgs);
+  }
+};
 Model.prototype.setup = function() {
   var _this = this;
+  this.events = {};
   this.queue = new Queue(function(cb) {
     cb.apply(_this);
   });
