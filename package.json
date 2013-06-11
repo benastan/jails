@@ -6,6 +6,8 @@
     "test": "mocha test/server/test.js"
   },
   "devDependencies": {
+    "nock": "*",
+    "nockstream": "*",
     "jquery": "*",
     "expect.js": "*",
     "mocha": "*",
