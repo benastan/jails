@@ -3,9 +3,9 @@ jails
 
 Javascript in Jail is an opinionated DSL for data manipulation and querying.
 
-- ECMA 5 compatible
-- node.js compatible
-- browser compatible
+- ECMA 5 compliant
+- Runs on node.js
+- Runs in the browser
 
 Get over it!
 
