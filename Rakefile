@@ -14,6 +14,7 @@ end
 
 namespace :test do
   task :client do
+    %x(grunt concat:test)
     %x(open public/index.html)
   end
 

@@ -201,9 +201,9 @@ var ModelTests = function(Model) {
           model.on(otherEventName, otherHandler);
           attrs = {};
         });
-        describe("#on, #trigger", function() {
+        describe("#on, #emit", function() {
           beforeEach(function() {
-            model.trigger(eventName);
+            model.emit(eventName);
           });
           it('runs the handler when triggered', function() {
             expect(eventName === otherEventName).to.be(false);
@@ -211,10 +211,10 @@ var ModelTests = function(Model) {
             expect(otherTestVar).to.be(false);
           });
         });
-        describe("#off", function() {
+        describe("#removeListener", function() {
           beforeEach(function() {
-            model.off(eventName);
-            model.trigger(eventName);
+            model.removeListener(eventName, handler);
+            model.emit(eventName);
           });
           it('does not run the handler', function() {
             expect(testVar).to.be(false);
@@ -235,10 +235,10 @@ var ModelTests = function(Model) {
           it("passes the changes as an argument", function(done) {
             attrs[key] = val;
             attrs.otherKey = 'somethingElse';
-            model.on('change:'+key, function(key, val) {
+            model.on('change:'+key, function(model, key, val) {
               expect(key).to.be(key);
             });
-            model.on('change', function(attrs) {
+            model.on('change', function(model, attrs) {
               expect(attrs[key]).to.be(val);
               done();
             });

@@ -169,6 +169,7 @@ describe("Jails.Dataset", function() {
       });
     });
   });
+  describe("events", function() {});
   describe("self as function", function() {
     var id;
     beforeEach(function() {

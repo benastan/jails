@@ -28,6 +28,7 @@ module.exports = function(grunt) {
         },
         src: [
           'src/jails/utility.js',
+          'src/jails/delegate.js',
           'src/jails/queue.js',
           'src/jails/dataset.js',
           'src/jails/ajax_data_source.js',
@@ -44,6 +45,8 @@ module.exports = function(grunt) {
         },
         src: [
           'src/jails/utility.js',
+          'src/jails/require.js',
+          'src/jails/delegate.js',
           'src/jails/queue.js',
           'src/jails/dataset.js',
           'src/jails/http_data_source.js',
@@ -56,10 +59,12 @@ module.exports = function(grunt) {
       test: {
         src: [
           'bower_components/jquery/jquery.js',
+          'bower_components/event_emitter/EventEmitter.js',
           'node_modules/expect.js/expect.js',
           'node_modules/mocha/mocha.js',
           'lib/jails.js',
           'test/client/test.js',
+          'test/shared/delegate_spec.js',
           'test/shared/model_spec.js',
           'test/shared/dataset_spec.js',
           'test/shared/queue_spec.js'
