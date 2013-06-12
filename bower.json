@@ -2,7 +2,8 @@
   "name": "jails",
   "version": "0.0.0",
   "dependencies": {
-    "jquery": "*"
+    "jquery": "*",
+    "event_emitter": "https://github.com/Wolfy87/EventEmitter.git"
   },
   "ignore": [
     "**/.*",

@@ -65,10 +65,13 @@ Model.prototype.set = function(key, val) {
   } else {
     for (var i in key) {
       val = key[i];
-      this.trigger('change:'+i, val);
+      this.emit('change:'+i, this, val);
     }
-    this.trigger('change', key);
+    this.emit('change', this, key);
   }
+};
+Model.prototype.initializeEventEmitter = function() {
+  this.eventEmitter = new EventEmitter();
 };
 Model.prototype.get = function(key) {
   var val, composer;
@@ -85,28 +88,18 @@ Model.prototype.save = function() {
     data: this.toHash(),
     success: function(res) {
       attrs = JSON.parse(res);
-      this.trigger('save');
+      this.emit('save', this);
       this.set(attrs);
     },
     error: function() {
       var args;
       args = Array.prototype.slice.apply(arguments);
       args.unshift('save');
-      this.trigger('error', args);
+      args.unshift(this);
+      args.unshift('error');
+      this.emit.apply(this, args);
     }
   };
-};
-Model.prototype.on = function(eventName, cb) {
-  var model, events;
-  model = this;
-  events = this.events[eventName] || (this.events[eventName] = new Queue(function(cb) { cb.call(this); }));
-  events.push(cb);
-};
-Model.prototype.off = function(eventName, cb) {
-  var events;
-  if ((events = this.events[eventName]) instanceof Queue) {
-    events.clear();
-  }
 };
 Model.prototype.toHash = function() {
   var attrs = this.attributes, composer;
@@ -115,19 +108,13 @@ Model.prototype.toHash = function() {
   }
   return attrs;
 };
-Model.prototype.trigger = function(eventName, arg1, arg2, etc) {
-  var additionalArgs, model, events;
-  additionalArgs = Array.prototype.slice.apply(arguments);
-  model = this;
-  eventName = additionalArgs.shift();
-  if ((events = this.events[eventName]) instanceof Queue) {
-    events.wrapper = function(cb) { cb.apply(model, additionalArgs); };
-    events.trigger(additionalArgs);
-  }
-};
 Model.prototype.setup = function() {
   var _this = this;
-  this.events = {};
+  new Delegate(this);
+  this.initializeEventEmitter();
+  this.delegate('on emit once listeners hasListeners addListener removeListener removeAllListeners setMaxListeners'.split(' '), {
+    to: function() { return this.eventEmitter; }
+  });
   this.queue = new Queue(function(cb) {
     cb.apply(_this);
   });
@@ -152,34 +139,15 @@ Model.extend = function(proto) {
   klass.composers = {};
   return klass;
 };
-var DelegatedMethodsWithObjects = {
-  'all limit page where': function() {
-    return new Query(this);
-  },
-  'count add remove find empty filter first last at': function() { return this.dataset; }
-};
-var DelegatedMethods = (function(methods) {
-  var keys = (function(memo) {
-        for (var i in methods) {
-          memo.push(i);
-        }
-        return memo;
-      }([]));
-  return keys.reduce(function(memo, key) {
-    var methodNames = key.split(' ');
-    for (var i in methodNames) {
-      memo[methodNames[i]] = (function(objectMethod, methodName) {
-        return function() {
-          var model = this, object;
-          object = objectMethod.apply(model);
-          return object[methodName].apply(object, arguments);
-        };
-      }(methods[key], methodNames[i]));
-    }
-    return memo;
-  }, {});
-}(DelegatedMethodsWithObjects));
-$.extend(Model, DelegatedMethods);
+var delegate = new Delegate(Model);
+Model.delegate('all limit page where'.split(' '), {
+  to: function() { return new Query(this); }
+});
+Model.delegate('count add remove find empty filter first last at'.split(' '), {
+  to: function() {
+    return this.dataset;
+  }
+});
 Model.fetch = function() {
   return this.all().query();
 };
